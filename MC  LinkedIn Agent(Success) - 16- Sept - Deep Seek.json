@@ -1,0 +1,186 @@
+{
+  "name": "MC  LinkedIn Agent(Success) - 16- Sept - Deep Seek",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -320,
+        -48
+      ],
+      "id": "78b4a91b-5ec1-420f-947b-22b8d3536148",
+      "name": "When chat message received",
+      "webhookId": "ec18f91e-ffab-4dfb-b115-484f8bc73ec0"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpfulYou are a LinkedIn content writer. Based on the message or topic I provide, write ONE concise, engaging, professional LinkedIn post for the target audience.\n\nOUTPUT RULES:\n- Return ONLY the post text. Nothing else — no headings, no \"Why this works,\" no tips, no explanation, no offer to refine it, no closing remarks. Your entire response IS the post.\n- Do not repeat, summarize, or comment on your own output.\n\nFORMATTING RULES:\n- Plain text only. Never use *, **, _, \\, ~, `, #, >, or - as formatting characters anywhere in the output.\n- Never wrap words in asterisks for emphasis. Use CAPITAL LETTERS or an emoji instead.\n- Never use \">\" for quotes — write the quote in plain text with normal quotation marks.\n- Never use \"-\" as a bullet. Use → or an emoji instead.\n- Use plain line breaks between paragraphs.\n- End with hashtags in plain text, no links, no symbols beside the # itself.\n\nIf you are about to output any of these banned characters (*, _, \\, ~, `, #, >, -), replace them with plain words or remove them instead. assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "071f2244-1a81-41b6-a664-7c4c7985a06b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        208
+      ],
+      "id": "fe077044-e0b3-422b-b0e6-bf7364b4e1f8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        192
+      ],
+      "id": "0d866276-65b7-4a8a-9aea-449aa5cbe8ff",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "Lg_5HUA8Px",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -48
+      ],
+      "id": "11106db3-2f72-4890-9d09-1b2b78c0896a",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "dwccY2MqCtpvuD11",
+          "name": "MC 470 LinkedIn Working"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  // Try common field names automatically\n  let text = item.json.output ?? item.json.text ?? item.json.response ?? '';\n\n  if (!text) {\n    // nothing to clean — return item as-is so the workflow doesn't break\n    return item;\n  }\n\n  text = text.replace(/\\*\\*(.*?)\\*\\*/g, '$1');\n  text = text.replace(/\\*(.*?)\\*/g, '$1');\n  text = text.replace(/[\\\\*_~`#>]/g, '');\n  text = text.replace(/^-\\s+/gm, '→ ');\n  text = text.split(/\\n---\\n/)[0];\n  text = text.replace(/\\n{3,}/g, '\\n\\n').trim();\n\n  item.json.output = text; // normalize to \"output\" so downstream node is consistent\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        -48
+      ],
+      "id": "e4011fba-2e0c-41b8-9375-e6efc56f66f3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "Dummy Linkedin ",
+        "height": 80,
+        "width": 160,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -528,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "86d02a4a-f6c1-4b87-b781-0cca403f5554",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "28eddfa1-2660-4bb2-9530-e238fa668dba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "PRGY2Lugee5Xrf68",
+  "tags": []
+}
