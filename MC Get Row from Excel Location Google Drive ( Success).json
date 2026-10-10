@@ -1,0 +1,185 @@
+{
+  "name": "MC Get Row from Excel Location Google Drive ( Success)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        32
+      ],
+      "id": "274c5d06-bfb5-454f-ad5f-ccb49e1cae42",
+      "name": "When chat message received",
+      "webhookId": "8cfc0e41-c82b-4164-9485-942f8ba26300"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        368,
+        288
+      ],
+      "id": "5093dd33-e92a-4f20-a607-86e5b9b464ac",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        272,
+        320
+      ],
+      "id": "dfa03570-855c-4835-98c2-8ae162cffd2e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "nvidia/nemotron-3-super-120b-a12b:free \n\nnvidia/nemotron-3-super-120b-a12\n\nhttps://claude.ai/chat/d5f8506e-4411-4643-b107-4c1a121f60ee",
+        "height": 176,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        784,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "73138132-9893-4467-9b47-68be73e7a512",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        272,
+        32
+      ],
+      "id": "2524f8b1-1482-432e-ba70-58b1c75052f4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "https://docs.google.com/spreadsheets/d/1K0tIBBXpwlETu7QHaEDtQQJfgt_kMb-GLJ9geU9aSro/edit?gid=1786183350#gid=1786183350",
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        704,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "3af212be-645a-4d33-88d3-b7b3c234c2b3",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1K0tIBBXpwlETu7QHaEDtQQJfgt_kMb-GLJ9geU9aSro",
+          "mode": "list",
+          "cachedResultName": "AI Agent Domination Worksheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K0tIBBXpwlETu7QHaEDtQQJfgt_kMb-GLJ9geU9aSro/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1786183350,
+          "mode": "list",
+          "cachedResultName": "101_GoogleAccountSetup",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K0tIBBXpwlETu7QHaEDtQQJfgt_kMb-GLJ9geU9aSro/edit#gid=1786183350"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        432
+      ],
+      "id": "d4c4579d-0d6e-4c92-a58b-e96e5b9e75af",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bMFRLJsfz0bUgE9",
+          "name": "MC Google Sheets"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "48dea4b6-3b15-4b46-9c93-d6b931918c90",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "KfhXT0WXx9AFcyPh",
+  "tags": []
+}

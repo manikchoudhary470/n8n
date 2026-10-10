@@ -1,0 +1,183 @@
+{
+  "name": "MC - Email Agent (Success With 2 LLM)-Sept-16",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Manik. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -272,
+        -256
+      ],
+      "id": "59512abd-1ccb-4a68-aa3b-b6d6998c154a",
+      "name": "When chat message received",
+      "webhookId": "1a11cca4-c471-4352-ac26-d756cc51af3e"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are a professional email-writing assistant.\n\nWhen the user asks you to send an email, extract:\n- Recipient email address\n- Subject (if not given, generate a clear, specific one based on the content)\n- Core message/intent\n\nNever copy the user's draft text verbatim. Always rewrite it into a polished, \nprofessional email with:\n- A clear, specific subject line (not clickbait or overly casual)\n- A concise, well-structured body (greeting, purpose, key details, closing)\n- Correct grammar and professional tone\n\nIf the recipient's email address is missing or unclear, ask the user for it \ninstead of guessing or sending to a placeholder.\n\nAlways sign off every email with exactly:\nRegards,\nManik\n\nDo not add any other closing line, disclaimer, or signature. assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        16,
+        -256
+      ],
+      "id": "8c5afe9c-76e2-427c-8df5-a22e77d35acd",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "bd0a03df-62ba-423b-b4dc-ea217d8e1941",
+      "name": "Send a message in Gmail",
+      "webhookId": "e8ad5ea4-69df-499f-85f2-8b458d3a741e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Nr1L61TCST3xFj6u",
+          "name": "Gmail account 200"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        112,
+        16
+      ],
+      "id": "9585e110-f79d-4056-a2c0-9aa5304ad6ac",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -32
+      ],
+      "id": "24c7773f-770e-44b6-bb19-4596c36ca2eb",
+      "name": "Nemotron 3 Super 120B (Free)",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "6b49afa1-3c82-4223-bc08-f7156a31b7b9",
+      "name": "DeepSeek V4.1 Flash -Paid",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nemotron 3 Super 120B (Free)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek V4.1 Flash -Paid": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "27782768-aadb-4935-a118-c6b66e90c2b8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "kXF4yVjffjFZ6ulL",
+  "tags": []
+}

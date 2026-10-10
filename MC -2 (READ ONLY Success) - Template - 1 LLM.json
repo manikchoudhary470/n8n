@@ -1,0 +1,130 @@
+{
+  "name": "MC -2 (READ ONLY Success) - Template - 1 LLM",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d29ec0bb-f225-4856-aca6-cb1899d5c8e5",
+      "name": "When chat message received",
+      "webhookId": "4fbbe181-94c4-480a-9c20-86c495775ffa"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8a5eb631-8e5a-4093-81c2-c9761a02e628",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        320,
+        272
+      ],
+      "id": "077ffe50-47cf-4c65-befc-e3c8b27fb442",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "READ ONLY",
+        "height": 96,
+        "width": 182,
+        "color": "#C1103C"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "25b87508-82c4-4590-8955-c7d06965a741",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        224,
+        240
+      ],
+      "id": "c1ace7f7-3a53-4497-9e8e-326c099109fd",
+      "name": "Nemotron-3-super-Free",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nemotron-3-super-Free": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a52caaec-9ecf-4e91-bb81-52f065c58c29",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "SUZMlXlejAcJZEtZ",
+  "tags": []
+}

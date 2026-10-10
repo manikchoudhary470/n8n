@@ -1,0 +1,363 @@
+{
+  "name": "SG Data Analyst with Supabase Latest-working",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### 2/ Change Supabase Credentials\nThe rest will be done",
+        "height": 112,
+        "width": 263,
+        "color": 6
+      },
+      "id": "4f6cb06f-2afa-4aff-af93-2dd93d3b69af",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        464,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Set up steps\n\n#### Preparation\n1. **Create Accounts**:\n   - [N8N](https://n8n.partnerlinks.io/2hr10zpkki6a): For workflow automation.\n   - [Supabase](https://supabase.com/): For database hosting and management.\n   - [OpenAI](https://openai.com/): For building the conversational AI agent.\n2. **Configure Database Connection**:\n   - Set up a PostgreSQL database in Supabase.\n   - Use appropriate credentials (`username`, `password`, `host`, and `database` name) in your workflow.\n\n#### N8N Workflow\n\nAI agent with tools:\n\n1. **Run SQL QueryTool**:\n   - Execute SQL queries based on user input.\n2. **Database Schema Tool**:\n   - Retrieve a list of all tables in the database.\n   - Use a predefined SQL query to fetch table definitions, including column names, types, and references.\n3. **Table Definition**:\n   - Retrieve a list of columns with types for one table.",
+        "height": 586,
+        "width": 640,
+        "color": 7
+      },
+      "id": "4f78a539-7a04-461f-a99b-4fe78f8591d1",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        352
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## AI Agent to chat with Supabase/PostgreSQL DB\n\nAccessing and analyzing database data often requires SQL expertise or dedicated reports, which can be time-consuming. This workflow empowers users to interact with a database conversationally through an AI-powered agent. It dynamically generates SQL queries based on user requests, streamlining data retrieval and analysis.\n\nThis workflow integrates LLM with a Supabase database, enabling users to interact with their data via an AI agent. The agent can:\n- Retrieve records from the database.\n- Extract and analyze JSON data stored in tables.\n- Provide summaries, aggregations, or specific data points based on user queries.\n\n",
+        "height": 317,
+        "width": 636,
+        "color": 7
+      },
+      "id": "b31a8e15-9882-476f-a74e-feba17156200",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "id": "ed4aaf5f-6963-47aa-8311-099053e7599e",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        768,
+        208
+      ],
+      "webhookId": "67c52c70-0c72-4bfe-aa29-019e58ed454b",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get list of all tables in database",
+        "operation": "executeQuery",
+        "query": "SELECT table_schema, table_name\nFROM information_schema.tables\nWHERE table_type = 'BASE TABLE' AND table_schema = 'public';",
+        "options": {}
+      },
+      "id": "29f6c46f-656c-4637-93d8-7ecf344baa32",
+      "name": "DB Schema",
+      "type": "n8n-nodes-base.postgresTool",
+      "position": [
+        1152,
+        480
+      ],
+      "typeVersion": 2.5,
+      "credentials": {
+        "postgres": {
+          "id": "JaGBJPz41k7Or7G5",
+          "name": "MC Postgress-10-Oct"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get table definition to find all columns and types.",
+        "operation": "executeQuery",
+        "query": "SELECT \n    c.column_name,\n    c.data_type,\n    c.is_nullable,\n    c.column_default,\n    tc.constraint_type,\n    ccu.table_name AS referenced_table,\n    ccu.column_name AS referenced_column\nFROM \n    information_schema.columns c\nLEFT JOIN \n    information_schema.key_column_usage kcu \n    ON c.table_name = kcu.table_name \n    AND c.column_name = kcu.column_name\nLEFT JOIN \n    information_schema.table_constraints tc \n    ON kcu.constraint_name = tc.constraint_name\n    AND tc.constraint_type = 'FOREIGN KEY'\nLEFT JOIN\n    information_schema.constraint_column_usage ccu\n    ON tc.constraint_name = ccu.constraint_name\nWHERE \n    c.table_name = '{{ $fromAI(\"table_name\") }}' -- Your table name\n    AND c.table_schema = 'public' -- Ensure it's in the right schema\nORDER BY \n    c.ordinal_position;\n",
+        "options": {}
+      },
+      "id": "8ba3cd7d-0802-4f1d-9fe8-e3990831e1b5",
+      "name": "Get table definition",
+      "type": "n8n-nodes-base.postgresTool",
+      "position": [
+        1536,
+        496
+      ],
+      "typeVersion": 2.5,
+      "credentials": {
+        "postgres": {
+          "id": "JaGBJPz41k7Or7G5",
+          "name": "MC Postgress-10-Oct"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Run custom SQL queries using knowledge about Output structure to provide needed response for user request.\nUse ->> operator to extract JSON data.",
+        "operation": "executeQuery",
+        "query": "{{ $fromAI(\"query\",\"SQL query for PostgreSQL DB in Supabase\") }}",
+        "options": {}
+      },
+      "id": "94c92118-bcf1-4cee-af98-a7379d58bb33",
+      "name": "Run SQL Query",
+      "type": "n8n-nodes-base.postgresTool",
+      "position": [
+        1856,
+        464
+      ],
+      "typeVersion": 2.5,
+      "credentials": {
+        "postgres": {
+          "id": "JaGBJPz41k7Or7G5",
+          "name": "MC Postgress-10-Oct"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        544,
+        448
+      ],
+      "id": "89d0f7fd-7dea-4ecb-9512-b40c5e9a1be0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BGYPLegUOlZXdBDB",
+          "name": "Google Gemini(PaLM) Api account 205"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Insights Agent",
+        "height": 544,
+        "width": 1664
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        464,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "db95c244-a373-4567-9c4d-c0d4d6a83112",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### DB Schema\n\nGet list of all tables in database\n\n'''\nSELECT table_schema, table_name\nFROM information_schema.tables\nWHERE table_type = 'BASE TABLE' AND table_schema = 'public';\n'''",
+        "height": 288,
+        "width": 368,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        832,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "06fbdd30-bf2e-4f2b-858b-15eb757eac76",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### 1/ Change Brain",
+        "height": 224,
+        "width": 279,
+        "color": 6
+      },
+      "id": "8099f45f-5a83-43c9-8b24-2cdb6d8da557",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        384
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Run SQL Query\n\nRun custom SQL queries using knowledge about Output structure to provide needed response for user request.\nUse ->> operator to extract JSON data.",
+        "height": 368,
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1696,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "e85f7bdc-67f2-4b8c-ba89-d5d8fc0cb905",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "### Get Table Definition\n\nGet list of all tables in database\n\nOpen Node to See Code",
+        "height": 192,
+        "width": 416,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1264,
+        448
+      ],
+      "typeVersion": 1,
+      "id": "3380a56b-aec9-4bc9-9c6c-e8c72d5670fd",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash-lite-preview-09-2025",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        656,
+        448
+      ],
+      "id": "3c9cd09a-38bd-457c-92c3-9a1e5f01825e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        336
+      ],
+      "id": "f8740bd0-11e9-44f6-979e-49e76e6b2840",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are DB assistant. You need to run queries in DB aligned with user requests. Whenever you use column names in the query enclose with double quotes. Example instead of SUM(Units) write SUM(\"Units\")\n\nRun custom SQL query to aggregate data and response to user.\n\nFetch all data to analyse it for response if needed.\n\nAlways fetch the schema and table defination before you create the query. \n\nUse these in sequence to get the relevant results\n1. DB Schema  - for getting all tables from database\n2. Get table definition - for getting schema of relevant table by using DB Schema\n3. Run SQL Query - for querying the actual user problem by using  \"DB Schema\" and \"Get table definition\"\n\nConsider table tbl_transactions for all orders and transactions of customers\n\n\nNever delete any table or schema\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1136,
+        176
+      ],
+      "id": "167b794a-aced-4c0b-8a3e-bea2142dcd53",
+      "name": "AI Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Schema": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get table definition": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run SQL Query": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4e1f7b4a-9d75-4f3d-8773-8c73188f5568",
+  "meta": {
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "eOsPpLCvLLkKJ2WC",
+  "tags": []
+}

@@ -1,0 +1,151 @@
+{
+  "name": "MC  LinkedIn Agent(Success)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -320,
+        -48
+      ],
+      "id": "2ac6fc27-ec7a-4cf1-abd6-e578a2cc1234",
+      "name": "When chat message received",
+      "webhookId": "eb46c9b5-9153-4260-abfa-c995d4b766af"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -32,
+        -48
+      ],
+      "id": "701fff89-2f3f-497b-93a9-ae5760cbb0ae",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        304
+      ],
+      "id": "c3a10b5b-162a-4c49-95bb-b529812c6e6e",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "person": "Lg_5HUA8Px",
+        "text": "=",
+        "shareMediaCategory": "ARTICLE",
+        "additionalFields": {
+          "originalUrl": "https://hfmsbook.com/"
+        }
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        96,
+        96
+      ],
+      "id": "10be069f-4797-4c1d-842a-78b10ee56e6f",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "dwccY2MqCtpvuD11",
+          "name": "MC 470 LinkedIn Working"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-nano-30b-a3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        224
+      ],
+      "id": "c7129e3c-547f-4fab-bd96-6a09c1e5d9cf",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\nhttps://www.linkedin.com/in/manik-choudhary-252939435/recent-activity/all/"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "7271e1e0-fd01-49fa-862b-8986c3a9c889",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4e04bf75-2a52-40a1-ad82-e6ecb58abad5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "Aq6m7ERC42xuYbCQ",
+  "tags": []
+}

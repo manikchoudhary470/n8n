@@ -1,0 +1,151 @@
+{
+  "name": "MC - Google Gemini (Error)",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Manik. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -272,
+        -256
+      ],
+      "id": "21300e68-0a96-4fb9-9b16-8f6afbb2c2f4",
+      "name": "When chat message received",
+      "webhookId": "249ea963-7ba7-4187-8d82-79455483d906"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are a professional email-writing assistant.\n\nWhen the user asks you to send an email, extract:\n- Recipient email address\n- Subject (if not given, generate a clear, specific one based on the content)\n- Core message/intent\n\nNever copy the user's draft text verbatim. Always rewrite it into a polished, \nprofessional email with:\n- A clear, specific subject line (not clickbait or overly casual)\n- A concise, well-structured body (greeting, purpose, key details, closing)\n- Correct grammar and professional tone\n\nIf the recipient's email address is missing or unclear, ask the user for it \ninstead of guessing or sending to a placeholder.\n\nAlways sign off every email with exactly:\nRegards,\nManik\n\nDo not add any other closing line, disclaimer, or signature. assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        16,
+        -256
+      ],
+      "id": "c1eb23ef-0ca2-406b-b8da-6de501658240",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "779c7e18-f382-4462-9cba-3086ca1c55a9",
+      "name": "Send a message in Gmail",
+      "webhookId": "3ba48ac3-2f6b-455b-8e48-636c66b45267",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Nr1L61TCST3xFj6u",
+          "name": "Gmail account 200"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        112,
+        16
+      ],
+      "id": "2031b446-996a-4c86-92af-187514b03648",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -48
+      ],
+      "id": "828cf1ee-fea9-4de5-afea-a1865da22b7c",
+      "name": "MC Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BGYPLegUOlZXdBDB",
+          "name": "Google Gemini(PaLM) Api account 205"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MC Google Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3bca5bc8-16c5-4d6e-90a6-d4a907b7684c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "djGuy6Rgu774uufO",
+  "tags": []
+}

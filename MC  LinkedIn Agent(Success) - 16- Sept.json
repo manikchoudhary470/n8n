@@ -1,0 +1,183 @@
+{
+  "name": "MC  LinkedIn Agent(Success) - 16- Sept",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -320,
+        -48
+      ],
+      "id": "a5b37fab-7234-4722-88f5-c0db7c5fb996",
+      "name": "When chat message received",
+      "webhookId": "d74c732d-9964-4129-9302-ec8b8243fb42"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpfulYou are a LinkedIn content writer. Based on the message or topic I provide, write ONE concise, engaging, professional LinkedIn post for the target audience.\n\nOUTPUT RULES:\n- Return ONLY the post text. Nothing else — no headings, no \"Why this works,\" no tips, no explanation, no offer to refine it, no closing remarks. Your entire response IS the post.\n- Do not repeat, summarize, or comment on your own output.\n\nFORMATTING RULES:\n- Plain text only. Never use *, **, _, \\, ~, `, #, >, or - as formatting characters anywhere in the output.\n- Never wrap words in asterisks for emphasis. Use CAPITAL LETTERS or an emoji instead.\n- Never use \">\" for quotes — write the quote in plain text with normal quotation marks.\n- Never use \"-\" as a bullet. Use → or an emoji instead.\n- Use plain line breaks between paragraphs.\n- End with hashtags in plain text, no links, no symbols beside the # itself.\n\nIf you are about to output any of these banned characters (*, _, \\, ~, `, #, >, -), replace them with plain words or remove them instead. assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -32,
+        -48
+      ],
+      "id": "82ac6976-737f-40e7-9c4c-c734f797a156",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        304
+      ],
+      "id": "b2947841-58d6-4e92-b206-049d3a2fedf9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-nano-30b-a3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        224
+      ],
+      "id": "9bcd9b01-bf1d-4226-973e-d2d59c6fdfd3",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\nhttps://www.linkedin.com/in/manik-choudhary-252939435/recent-activity/all/"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "82ed8a09-2d34-4619-8961-0985b0afa65c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "person": "Lg_5HUA8Px",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        496,
+        16
+      ],
+      "id": "a7b022e3-30a7-408a-a71a-5e4913b82cf3",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "dwccY2MqCtpvuD11",
+          "name": "MC 470 LinkedIn Working"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  // Try common field names automatically\n  let text = item.json.output ?? item.json.text ?? item.json.response ?? '';\n\n  if (!text) {\n    // nothing to clean — return item as-is so the workflow doesn't break\n    return item;\n  }\n\n  text = text.replace(/\\*\\*(.*?)\\*\\*/g, '$1');\n  text = text.replace(/\\*(.*?)\\*/g, '$1');\n  text = text.replace(/[\\\\*_~`#>]/g, '');\n  text = text.replace(/^-\\s+/gm, '→ ');\n  text = text.split(/\\n---\\n/)[0];\n  text = text.replace(/\\n{3,}/g, '\\n\\n').trim();\n\n  item.json.output = text; // normalize to \"output\" so downstream node is consistent\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        16
+      ],
+      "id": "0bc61e05-5d9b-4a19-a938-6a34e3e910e2",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e9164399-326b-467d-b1e9-54e90711988f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "uMPE98HlY3V42MpZ",
+  "tags": []
+}

@@ -1,0 +1,162 @@
+{
+  "name": "MC-3 (READ ONLY Success) - Template -2 LLM",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "167bed55-41ef-449a-ad6b-9ce91ae071fe",
+      "name": "When chat message received",
+      "webhookId": "bf036d0d-540f-4b2e-9c20-1aab54af0485"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        0
+      ],
+      "id": "43947cd3-648b-4150-b2af-9caca5ea9145",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        496,
+        240
+      ],
+      "id": "9718a7b5-a9a8-410e-9636-b00ea3e8a3eb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "READ ONLY",
+        "height": 96,
+        "width": 182,
+        "color": "#C1103C"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -240,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "20d6c6bf-5d84-4cd4-a7ca-7938833dd61a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        208,
+        224
+      ],
+      "id": "e4a0eb7f-f5f8-46ef-a768-e5d6d672288d",
+      "name": "Nemotron-3-super-Free",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-super-120b-a12b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        352,
+        208
+      ],
+      "id": "127fa26c-521d-470d-8625-6629379f0379",
+      "name": "Nemotron-3-super(Paid)",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tZURVxZJSn39rUGZ",
+          "name": "MC Working OpenRouter"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nemotron-3-super-Free": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nemotron-3-super(Paid)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0fad962b-4b0d-461a-949f-80c098e8d9af",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e99e0d1157c9445a053edb1d8bcb3c19869f806f2b50808813faa4f314de9dd4"
+  },
+  "nodeGroups": [],
+  "id": "xDpvL9g6znnEsDDx",
+  "tags": []
+}
